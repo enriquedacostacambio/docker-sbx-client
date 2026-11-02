@@ -5,8 +5,9 @@ docker sbx client packaged as a docker with a wrapper script for systems it does
 It's client only, only cloud commands work (`--cloud`)
 
 ## Install
+
 ```
-curl \
+curl -fsSL \
     https://raw.githubusercontent.com/enriquedacostacambio/docker-sbx-client/refs/tags/x.y.z/src/sbx \
     -o /usr/local/bin/sbx \
     && chmod +x /usr/local/bin/sbx
