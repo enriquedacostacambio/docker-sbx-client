@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+SBX_DEFAULT_ENTRYPOINT=/usr/bin/sbx
+SBX_CURRENT_ENTRYPOINT=$(realpath ${0})
+SSH_CONFIG_DIR=~/.ssh/sandboxes/config
+SBX_SSH_CONFIG=${SSH_CONFIG_DIR}/sandboxes/config
+
+# default to tty, unless using known command that doesn't support it. 
+if [ "${SBX_TTY}" = "false" ] \
+        || [ "${1}" = "login" ] \
+        || [ "${1} ${2}" = "--cloud ssh-connect" ]; then
+    SBX_DOCKER_PARAMS=${SBX_DOCKER_PARAMS}
+else
+    SBX_DOCKER_PARAMS=${SBX_DOCKER_PARAMS:=-t}
+fi
+docker run -i ${SBX_DOCKER_PARAMS} \
+    -v ~/.ssh:/root/.ssh \
+    -v ~/config/com.docker.sandboxes:/root/.config/com.docker.sandboxes \
+    docker.io/enriquedacostacambio/docker-sbx-client:0.0.1 \
+    "${@}"
+
+# replace entrypoint if the default doesnt exist
+if [ -e "${SBX_SSH_CONFIG}" ] && [ ! -e "${SBX_DEFAULT_ENTRYPOINT}" ] && [ "${1} ${2} ${3}" = "--cloud setup ssh" ]; then
+    sed -i "" "s|ProxyCommand \"${SBX_DEFAULT_ENTRYPOINT}\"|ProxyCommand \"${SBX_CURRENT_ENTRYPOINT}\"|g" "${SBX_SSH_CONFIG}"
+fi
